@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dmartinezl.generics.GenericValidPassword;
 import com.dmartinezl.models.dto.UserDto;
 import com.dmartinezl.models.servicesImpl.UsuarioServiceImpl;
 
@@ -35,14 +36,16 @@ public class Controller {
 	@Autowired
 	private UsuarioServiceImpl usuarioServiceImpl;
 	
+	@Autowired
+	GenericValidPassword genericValidPassword ;
+	
 	
 	 @ApiOperation(value = "Post method for user creations")
 	@PostMapping(value = "/register" , consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = {
 			MediaType.APPLICATION_JSON_VALUE })
 	private ResponseEntity<?> save (@Valid @RequestBody UserDto userDto,BindingResult result){
 	
-		Map<String , Object> response =  new HashMap<>();
-		
+		Map<String , Object> response =  new HashMap<>();	
 		if (result.hasErrors()) {
 			List<String> errors = result.getFieldErrors().stream().map(err -> {
 				return "El campo '" + err.getField() + " ' " + err.getDefaultMessage();
@@ -53,6 +56,13 @@ public class Controller {
 			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		}
 		
+		 if (genericValidPassword.ValidPassword(userDto.getPassword()) != "Ok" ) {
+			 	String mensaje = genericValidPassword.ValidPassword(userDto.getPassword());
+			 	response.put("mensaje", mensaje);
+				logger.info( mensaje);
+				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		 }
+		 
 		try {
 						
 			if (usuarioServiceImpl.findByEmail(userDto.getEmail().trim()) == null) {	
