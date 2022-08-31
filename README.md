@@ -20,4 +20,4 @@ grant_type : password
 http://localhost:8060/api/user/register
 
 ## Notas 
-En caso de que el usuario supere un maximo de tres intentos se desactivara el usuario.
+En caso de que el usuario supere un maximo de tres intentos se inhabilitar  dentro del sistema.
